@@ -46,13 +46,13 @@ Experiments on AIME 2025, GPQA-Diamond, LiveCodeBench v6, and LongBench v2 with 
 conda create -n pipo python=3.12 -y
 conda activate pipo
 
-bash install.sh
+bash scripts/install.sh
 ```
 
 
 ## 🚀 Evaluate PIPO and baseline methods
 
-### 0. Download the checkpoints from Hugging Face
+### 0. Download the checkpoints, models, and eval benchmarks from Hugging Face
 
 The trained checkpoints are available on [Hugging Face](https://huggingface.co/AlbertTan/PIPO).
 Download the `outputs/` directory into `/path/to/PIPO/`. You should then see files like:
@@ -61,10 +61,15 @@ Download the `outputs/` directory into `/path/to/PIPO/`. You should then see fil
 outputs/Qwen3.5-4B/sft_mlp_sft_all_65535_0.25_2epochs/checkpoint-1500/
 ```
 
+Then download the base models and benchmarks from Hugging Face:
+```
+bash scripts/download.sh
+```
+
 ### 1. Merge LoRA weights
 
 ```bash
-bash merge_lora.sh outputs/Qwen3.5-4B/sft_mlp_sft_all_65535_0.25_2epochs/checkpoint-1500
+bash scripts/merge_lora.sh outputs/Qwen3.5-4B/sft_mlp_sft_all_65535_0.25_2epochs/checkpoint-1500
 ```
 
 This produces a sibling directory with merged weights:
@@ -112,18 +117,18 @@ This produces files like `data/sft_all.jsonl.cache/train`.
 
 ### 2. SFT training
 
-Running `swift_sft.sh` with no arguments reproduces our default SFT setting.
+Running `scripts/swift_sft.sh` with no arguments reproduces our default SFT setting.
 
 ```bash
-bash swift_sft.sh
+bash scripts/swift_sft.sh
 ```
 
 ### 3. OPD training
 
-Running `swift_opd.sh` with the merged SFT checkpoint reproduces our default OPD setting.
+Running `scripts/swift_opd.sh` with the merged SFT checkpoint reproduces our default OPD setting.
 
 ```bash
-bash swift_opd.sh outputs/Qwen3.5-4B/sft_mlp_sft_all_65535_0.25_2epochs/checkpoint-1500-merged
+bash scripts/swift_opd.sh outputs/Qwen3.5-4B/sft_mlp_sft_all_65535_0.25_2epochs/checkpoint-1500-merged
 ```
 
 
@@ -163,6 +168,10 @@ Contributions to address any of the following are very welcome.
 2. **The prefill stage does not emit a draft token (token2)** because of CUDA-graph constraints. A PAD token is automatically inserted after the backbone token (token1).
 3. **`enable_memory_saver` / `SLEEP_LEVEL` are unsupported on the SGLang + ms-swift OPD path.** OPD therefore needs ~130 GB / GPU, while SFT only needs ~75 GB / GPU.
 4. **Only Qwen3.5 backbones are supported** at the moment.
+
+
+## 🤖 Vibe-Coding with PIPO:
+Please ask your agents to read `.agents/PIPO.md` before working, to let them comprehensively understand PIPO & this repo.
 
 
 ## 📜 Citation
